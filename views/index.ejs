@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="stylesheets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Twisty Stats</title>
+</head>
+<body>
+    <header>
+        <a href="http://localhost:3001/"><h1>Twisty Stats</h1></a>
+    </header>
+    <h2 id="listTitle">Newest user lists</h2>
+    <div class="wrapper">
+    <%# Render users and their lists %>
+    <%# Revers so new users are at the top %>
+    <% data.data.reverse(); %>
+        <% data.data.forEach(user => { %>
+            <div class="user">
+                <h3 class="userName"><%= user.name %> </h3>
+                <ol class="userList">
+                <% user.list.forEach(twist => { %> 
+                    <li class="userListItem">
+                        <div class="twistName"> <%= twist.name %> </div>
+                    </li>
+                <% }) %> 
+                </ol>
+            </div>    
+        
+    <% }); %> 
+   
+
+   <%# Render top 3 twists %>
+   <%#########################################%>
+   
+   <%# Get only twist names and scores %>
+   <% let twist = [] ;
+    data.data.forEach(user =>{
+        user.list.forEach(twists =>{
+            twist.push(twists);
+        })
+   })%>
+
+   <%# Sort to seperate lists by name %> 
+   <% let sortedTwists = twist.reduce((acc, curr) => {
+    if (!acc[curr.name]) {
+      acc[curr.name] = [];
+    }
+    acc[curr.name].push(curr);
+    return acc;
+    }, {});
+
+    %> 
+
+    <%# Add score of each twist together and componsate for few entries%>
+    <% let twistPoints = [];
+        for (const property in sortedTwists) {
+            let finalScore = 0;
+
+            sortedTwists[property].forEach( twist =>{
+                finalScore += twist.score;
+            });
+         
+
+            let twistAndScore ={};
+            twistAndScore[property] = finalScore;
+            twistPoints.push(twistAndScore);
+         
+        }
+
+    %>
+
+    <%# Sort array in decending order %> 
+    <% twistPoints.sort((a, b) => {
+            return b[Object.keys(b)[0]] - a[Object.keys(a)[0]];
+        }); 
+        
+     %> 
+    <%# Render top 3 result to client %> 
+    <div class="top3">
+        <h2>Overall top 3 twists</h2>
+        <ol>
+            <% for (let i = 0; i < 3; i++) { %> 
+                <li> <%= Object.keys(twistPoints[i]) %> </li>
+           <% } %>
+        </ol>
+    </div>
+
+    <%# Render Submit form %>
+   <%#########################################%>
+   <form id="form" action="http://localhost:3001" method="post">
+        <h2>Make your own top 3</h2>
+        <div class="grouper">
+            <label for="userName">Username:</label>
+            <input type="text" id="userName" name="userName">
+        </div>
+        <div class="grouper">
+            <label for="nrOneTwist">Favorite twist:</label>
+            <input type="text" id="nrOneTwist" name="nrOneTwist">
+        </div>
+        <div class="grouper">
+            <label for="nrTwoTwist">Second favorite twist:</label>
+            <input type="text" id="nrTwoTwist" name="nrTwoTwist">
+        </div>
+
+        <div class="grouper">
+            <label for="nrThreeTwist">Third favorite twist:</label>
+            <input type="text" id="nrThreeTwist" name="nrThreeTwist">
+        </div>
+
+
+        <input class="button" type="submit" value="Submit">
+  </form>
+  
+    </div>
+</body>
+</html>
